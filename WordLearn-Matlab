@@ -1,0 +1,21 @@
+%Fabrizio Roberts
+%Needs to be run with C++ code
+
+clear
+clc
+
+%converting csv to matrix 
+generationData = readmatrix('GenerationData.csv');
+generation = generationData(:,1);
+peakFitness = generationData(:,2)';
+avgFit = generationData(:,3)';
+
+%creating graph
+plot(generation', avgFit');
+hold on
+plot(generation', peakFitness');
+xlabel('Generation');
+ylabel('Fitness');
+title('Average and Max Fitness');
+xlim([0 inf]);
+ylim([0 1]);
