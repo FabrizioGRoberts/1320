@@ -1,0 +1,311 @@
+//Program for an ATM machine with an added gambling option
+
+#include <iostream>
+#include <ctime>
+using namespace std;
+
+void menu();
+void newAccount(string accountNames[], int accountPassword[]);
+void deposit(string accountNames[], int accountPassword[], int accountBalance[]);
+void withdraw(string accountNames[], int accountPassword[], int accountBalance[]);
+void balance(string accountNames[], int accountPassword[], int accountBalance[]);
+void gambling(string accountNames[], int accountPassword[], int accountBalance[], int gamble[]);
+void swapValues (int gamble[], int accountBalance [], int j, int i);
+
+int main()
+{
+    menu();
+}
+
+void menu()
+{
+    int choice, atmON;
+    
+    //"turning on" the atm 
+    atmON = 1;
+
+    //initializing account names, passwords, and balances
+    string accountNames[100] = {};
+    int accountPassword[100] = {0};
+    int accountBalance[100] = {0};
+    int gamble[10] = {0, 500, 10, 1000, 20, 5000, 30, 10000, 40, 50000};
+
+    while (atmON == 1)
+    {
+        cout << "--ATM MENU LIST--" <<endl;
+        cout << "1. Make an account" <<endl;
+        cout << "2. Deposit" <<endl;
+        cout << "3. Withdraw" <<endl;
+        cout << "4. Balance" <<endl;
+        cout << "5. Gambling" <<endl;
+        cout << "6. Finish" <<endl;
+
+        cin >> choice;
+
+        //different menu choices
+        if (choice == 1)
+        {
+            newAccount(accountNames, accountPassword);
+        }
+        else if (choice == 2)
+        {
+            deposit(accountNames, accountPassword, accountBalance);
+        }
+        else if (choice == 3)
+        {
+            withdraw(accountNames, accountPassword, accountBalance);
+        }
+        else if (choice == 4)
+        {
+            balance(accountNames, accountPassword, accountBalance);
+        }
+        else if (choice == 5)
+        {
+            gambling(accountNames, accountPassword, accountBalance, gamble);
+        }
+        else if (choice == 6)
+        {
+            atmON = 0;
+        }
+        else
+        {
+            cout << "Choice not valid" <<endl;
+        }
+    }
+}
+
+void newAccount(string accountNames[], int accountPassword[])
+{
+    if (accountNames[99] != "")
+    {
+        cout << "The bank account database is full" << endl;
+    }
+    else
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            if (accountNames[i] == "")
+            {
+                cout << "Please enter name" <<endl;
+                cin >> accountNames[i];
+                cout << "Please enter 4 digit password" <<endl;
+                cin >> accountPassword[i];
+
+                cout << "Thank you for creating an account, " << accountNames[i] <<endl;
+                break;
+            } 
+        }
+    }
+}
+
+void deposit(string accountNames[], int accountPassword[], int accountBalance[])
+{
+    bool search = 0;
+
+    //determining name
+    string userName;
+    cout << "Please enter your account name: " <<endl;
+    cin >> userName;
+    
+    for (int i = 0; i < 100; i++)
+    {
+        if (accountNames[i] == userName)
+        {
+            //determining password
+            int password;
+            int depositVal;
+            cout << "Please enter your account password: " <<endl;
+            cin >> password;
+
+            if (accountPassword[i] == password)
+            {
+                //determining deposit value
+                cout << "How much would you like to deposit?" <<endl;
+                cin >> depositVal;
+
+                cout << "Old account balance: " << accountBalance[i] <<endl;
+                accountBalance[i] = accountBalance[i]+depositVal;
+                cout << "New account balance: " << accountBalance[i] <<endl;
+                
+                search = 1;
+                break;
+            }
+            else
+            {
+                cout << "Wrong password" <<endl;
+                
+                search = 1;
+                break;
+            }
+        }
+    }
+    if (search == 0)
+    {
+        cout << "No account under that name" <<endl;
+    }
+}
+
+void withdraw(string accountNames[], int accountPassword[], int accountBalance[])
+{
+    bool search = 0;
+
+    //determining name
+    string userName;
+    cout << "Please enter your account name: " <<endl;
+    cin >> userName;
+    
+    for (int i = 0; i < 100; i++)
+    {
+        if (accountNames[i] == userName)
+        {
+            //determining password
+            int password;
+            int withdrawVal;
+            cout << "Please enter your account password: " <<endl;
+            cin >> password;
+
+            if (accountPassword[i] == password)
+            {
+                cout << "Current account balance: " << accountBalance[i] <<endl;
+                
+                bool withdraw = 0;
+
+                while (withdraw == 0)
+                {
+                    //determining withdraw value
+                    cout << "How much would you like to withdraw?" <<endl;
+                    cin >> withdrawVal;
+
+                    if (withdrawVal <= accountBalance[i])
+                    {
+                        cout << "Old account balance: " << accountBalance[i] <<endl;
+                        accountBalance[i] = accountBalance[i]-withdrawVal;
+                        cout << "New account balance: " << accountBalance[i] <<endl;
+                
+                        search = 1;
+                        withdraw = 1;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                cout << "Wrong password" <<endl;
+                
+                search = 1;
+                break;
+            }
+        }
+    }
+    if (search == 0)
+    {
+        cout << "No account under that name" <<endl;
+    }
+}
+
+void balance(string accountNames[], int accountPassword[], int accountBalance[])
+{
+    bool search = 0;
+
+    //determining name
+    string userName;
+    cout << "Please enter your account name: " <<endl;
+    cin >> userName;
+    
+    for (int i = 0; i < 100; i++)
+    {
+        if (accountNames[i] == userName)
+        {
+            //determining password
+            int password;
+            int withdrawVal;
+            cout << "Please enter your account password: " <<endl;
+            cin >> password;
+
+            if (accountPassword[i] == password)
+            {
+                cout << "Current account balance: " << accountBalance[i] <<endl;
+
+                search = 1;
+                break;
+            }
+            else
+            {
+                cout << "Wrong password" <<endl;
+                
+                search = 1;
+                break;
+            }
+        }
+    }
+    if (search == 0)
+    {
+        cout << "No account under that name" <<endl;
+    }
+}
+
+void gambling(string accountNames[], int accountPassword[], int accountBalance[], int gamble[])
+{
+    bool search = 0;
+
+    //determining name
+    string userName;
+    cout << "Please enter your account name: " <<endl;
+    cin >> userName;
+    
+    for (int i = 0; i < 100; i++)
+    {
+        if (accountNames[i] == userName)
+        {
+            //determining password
+            int password;
+            int withdrawVal;
+            cout << "Please enter your account password: " <<endl;
+            cin >> password;
+
+            if (accountPassword[i] == password)
+            {
+                cout << "Current account balance: " << accountBalance[i] <<endl;
+                
+                if (accountBalance[i] < 500)
+                {
+                    cout << "Balance is below minimum for gambling" <<endl;
+
+                    search = 1;
+                    break;
+                }
+                else
+                {
+                    srand(time(NULL));
+                    int j = rand()%9;
+                    cout << "Old account balance: " << accountBalance[i] <<endl;
+                    swapValues(gamble, accountBalance, j, i);
+                    cout << "New account balance: " << accountBalance[i] <<endl;
+
+                    search = 1;
+                    break;
+                }   
+            }
+            else
+            {
+                cout << "Wrong password" <<endl;
+                
+                search = 1;
+                break;
+            }
+        }
+    }
+    if (search == 0)
+    {
+        cout << "No account under that name" <<endl;
+    }
+}
+
+void swapValues (int gamble[], int accountBalance [], int j, int i)
+{
+    //switches the ATM gambling account with users account 
+    int x;
+    x = gamble[j];
+    gamble[j] = accountBalance[i];
+    accountBalance[i] = x;
+}
