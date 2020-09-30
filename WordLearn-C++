@@ -1,0 +1,264 @@
+//This code is a rudimentary form of machine learning modeled after Darwins Theory of Evolution. 
+//The user inputs a word and the program outputs a graph showing the number of iterations needed to "learn" the inputted string.
+//Must be run with Matlab code to produce graph.
+
+#include <iostream>
+#include <ctime>
+#include <fstream>
+using namespace std;
+
+void buildPopulation(int populationSize, int DNAsize, string population[]);
+void calculateFitness(string population[], int DNAsize, int populationSize, double fitness[]);
+double buildMatingPool(double fitness[], int populationSize, int tickets[]);
+double findAvg(double fitness[], int populationSize);
+int ChristainMingle(int tickets[], int populationSize);
+void breed(int tickets[],string population[], int populationSize, int DNAsize);
+string combine1(string parent1, string parent2, int DNAsize);
+string combine2(string parent1, string parent2, int DNAsize);
+
+int main()
+{
+    srand(time(NULL));
+    
+    //initializing variables
+    const int populationSize = 200;
+    const int DNAsize = 18;
+    string population[populationSize] = {};
+    double fitness[populationSize] = {};
+    int tickets[populationSize] = {};
+    double peakFitness = 0;
+    double avgFit = 0;
+    int generation = 0;
+
+    //creating csv file
+    ofstream file;
+    file.open("GenerationData.csv");
+
+    buildPopulation(populationSize, DNAsize, population);
+    
+    while ((peakFitness != 1)||(generation == 500))
+    {
+        calculateFitness(population, DNAsize, populationSize, fitness);
+        avgFit = findAvg(fitness, populationSize);
+        peakFitness = buildMatingPool(fitness, populationSize, tickets);
+        breed(tickets, population, populationSize, DNAsize);
+        file << generation << "," << peakFitness << "," << avgFit << endl;
+        generation = generation + 1;
+        cout << "Population #" << generation << "Fitness" << peakFitness << population[] << 
+    }
+    return 0;
+}
+
+void buildPopulation(int populationSize, int DNAsize, string population[])
+{
+    char DNA[DNAsize];
+    char randChar[54] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+    //creating first generation
+    for (int i = 0; i < populationSize; ++i)
+    {
+        for (int j = 0; j < DNAsize; ++j)
+        {
+            DNA[j] = randChar[rand()%53];
+        }
+        population[i] = (string)DNA;
+    }
+}
+
+void calculateFitness(string population[], int DNAsize, int populationSize, double fitness[])
+{
+    string target = "To be or not to be";
+    string organism = "";
+
+    for (int i = 0; i < populationSize; ++i)
+    {
+        organism = population[i];
+        int fitnessScore = 0;
+        for (int j = 0; j < DNAsize; ++j)
+        {
+            if (organism.at(j) == target.at(j))
+            {
+                fitnessScore = fitnessScore + 1;
+            }
+        }
+        fitness[i] = (double)fitnessScore/(double)DNAsize;
+    }
+}
+
+double buildMatingPool(double fitness[], int populationSize, int tickets[])
+{
+    //initializing variables
+    double scale, peakFitness, i_peakFitness;
+
+    //setting peak fitness to 0
+    peakFitness = 0;
+
+    //determining "peak fitness"
+    for (int i = 0; i < populationSize; ++i)
+    {
+        if (peakFitness < fitness[i])
+        {
+            peakFitness = fitness[i];
+            i_peakFitness = i;
+        }
+    }
+
+    //determining scale
+    scale = 10/peakFitness;
+
+    //applying scale and changing type
+    for (int i = 0; i < populationSize; ++i)
+    {
+        tickets[i] = fitness[i]*scale;
+        tickets[i] = (int)tickets[i];
+    }
+    return peakFitness;
+}
+
+void breed(int tickets[],string population[], int populationSize, int DNAsize)
+{
+    //initializing variables
+    int i_parent1, i_parent2;
+    string parent1, parent2, kid;
+    string populationNew[populationSize];
+    
+
+    for (int i = 0; i < populationSize; ++i)
+    {
+        //finding two unique parents
+        i_parent1 = ChristainMingle(tickets, populationSize);
+        i_parent2 = ChristainMingle(tickets, populationSize);
+
+        if (i_parent1 == i_parent2)
+        {
+            while (i_parent1 == i_parent2)
+            {
+                i_parent2 = ChristainMingle(tickets, populationSize);
+            }
+        }
+        parent1 = population[i_parent1];
+        parent2 = population[i_parent2];
+
+        //"breeding" the parents
+        //kid = combine1(parent1, parent2, DNAsize);
+
+        kid = combine2(parent1, parent2, DNAsize);
+
+        populationNew[i] = kid;
+    }    
+    for (int i = 0; i < populationSize; ++i)
+    {
+        population[i] = populationNew[i];
+    }
+}
+
+int ChristainMingle(int tickets[], int populationSize)
+{
+    //initializing variables
+    int parent;
+    int x = 0;
+    int y = 0;
+    int ticketPool[2000] = {};
+    
+    for (int i = 0; i < populationSize; ++i)
+    {
+        if (tickets[i] != 0)
+        {
+            for (int j = 0; j < tickets[i]; ++j)
+            {
+                ticketPool[(j+y)] = i;
+                x = x+1;
+            }
+            y = x;
+        }
+    }
+    //determining parent 
+    parent = ticketPool[rand()%(x)];
+    
+    return parent;
+}
+
+string combine1(string parent1, string parent2, int DNAsize)
+{
+    //initializing variables
+    int midpoint, mutation;
+    int mutationRate = 4;
+    char offspring[DNAsize];
+    string TheOffspring;
+    char randChar[54] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+    
+    //determining midpoint
+    midpoint = rand()%(DNAsize);
+
+    for (int i = 0; i < DNAsize; ++i)
+    {
+        if (i < midpoint)
+        {
+            offspring[i] = parent1.at(i);
+        }
+        else
+        {
+            offspring[i] = parent2.at(i);
+        }
+        //causing mutation
+        mutation = rand()%100;
+        if (mutation < mutationRate)
+        {
+            offspring[i] = randChar[rand()%53];
+        }
+    }
+    
+    
+    //returning a string
+    TheOffspring = (string)offspring;
+    return TheOffspring;
+}
+
+string combine2(string parent1, string parent2, int DNAsize)
+{
+    //initializing variables
+    int rando, mutation;
+    int mutationRate = 4;
+    char offspring[DNAsize];
+    string TheOffspring;
+    char randChar[54] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz ";
+
+    for (int i = 0; i < DNAsize; ++i)
+    {
+        //randomizing each character of gene
+        rando = rand()%(2);
+        if (rando == 0)
+        {
+            offspring[i] = parent1.at(i);
+        }
+        else
+        {
+            offspring[i] = parent2.at(i);
+        }
+        //causing mutation
+        mutation = rand()%100;
+        if (mutation < mutationRate)
+        {
+            offspring[i] = randChar[rand()%53];
+        }
+    }
+    
+    //returning a string
+    TheOffspring = (string)offspring;
+    return TheOffspring;
+}
+
+double findAvg(double fitness[], int populationSize)
+{
+    //intitializing variables
+    double sum = 0;
+    double avgFit = 0;
+
+    for (int i = 0; i < populationSize; ++i)
+    {
+        sum = sum + fitness[i];
+    }
+
+    avgFit = (sum/populationSize);
+
+    return avgFit;
+}
